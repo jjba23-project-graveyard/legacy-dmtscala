@@ -1,0 +1,57 @@
+// dmtscala is the Data Model Translator for Scala
+
+// Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+
+// dmtscala is free software: you can redistribute it and/or modify
+// it under the terms of the Lesser GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// dmtscala is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the Lesser GNU General Public License
+// along with dmtscala.  If not, see <https://www.gnu.org/licenses/>.
+
+import org.scalatest._
+import flatspec._
+import matchers._
+import io.github.jjba23.dmtscala.Typescript._
+
+class TypescriptSpec extends AnyFlatSpec with should.Matchers {
+
+  "toTypescriptType" should "translate types properly" in {
+
+    val xs: Seq[(String, String)] = Seq(
+      "String"                 -> "string",
+      "Option[String]"         -> "string?",
+      "Seq[String]"            -> "string[]",
+      "Option[Seq[String]]"    -> "string[]?",
+      "List[String]"           -> "string[]",
+      "Option[List[String]]"   -> "string[]?",
+      "Boolean"                -> "boolean",
+      "Option[Boolean]"        -> "boolean?",
+      "Int"                    -> "number",
+      "Option[Int]"            -> "number?",
+      "Seq[Int]"               -> "number[]",
+      "Option[Seq[Int]]"       -> "number[]?",
+      "List[Int]"              -> "number[]",
+      "Option[List[Int]]"      -> "number[]?",
+      "Seq[SomeClass]"         -> "SomeClass[]",
+      "List[SomeClass]"        -> "SomeClass[]",
+      "Option[Seq[SomeClass]]" -> "SomeClass[]?"
+    )
+    xs.foreach { case (k, v) => toTypescriptType(k) should be(v) }
+  }
+
+  "toTypescriptName" should "translate names properly" in {
+    val xs: Seq[(String, String)] = Seq(
+      "someField"   -> "someField",
+      "`type`"      -> "type",
+      "`someField`" -> "someField"
+    )
+    xs.foreach { case (k, v) => toTypescriptName(k) should be(v) }
+  }
+}

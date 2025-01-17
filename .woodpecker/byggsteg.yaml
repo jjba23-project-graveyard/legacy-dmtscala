@@ -1,0 +1,17 @@
+steps:
+  update-jointhefreeworld:
+    image: debian
+    when:
+      - event: [push]
+        branch: [trunk]        
+    secrets: [BYGGSTEG_KEY]
+    # && apt upgrade -y
+    commands: |
+      apt update 
+      apt install -y curl
+      curl 'https://byggsteg.jointhefreeworld.org/api/v1/jobs/manage/submit' \
+        -X POST -H 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'username=Joe' \
+        --data-urlencode "password=$BYGGSTEG_KEY" \
+        --data-urlencode 'job-code=(lambda() `((project . "dmtscala")(branch-name . "trunk")(task . "sbt-test")(clone-url . "https://codeberg.org/jjba23/dmtscala")))'
+
