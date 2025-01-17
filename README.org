@@ -1,11 +1,10 @@
 #+title: dmtscala
 #+email: jjbigorra@gmail.com
 
-[[https://badgen.net/static/Scala/2.13.14/red?icon=scala]]
 
 dmtscala (DMT for short) aims to ease development in teams where Scala code is used by services written in other programming languages.
 
-e.g. Typescript frontends, other Python CLI tools, Haskell systems, or other software, typically via HTTP.
+- Scala :: 2.13.14  
 
 What if you could automatically convert data models into several languages?
 
