@@ -20,7 +20,8 @@ import flatspec._
 import matchers._
 import io.github.jjba23.dmtscala.Typescript._
 import io.github.jjba23.dmtscala.Typescript
-import io.github.jjba23.dmtscala.ModelField
+import io.github.jjba23.dmtscala.DMT
+import scala.meta._
 
 class TypescriptSpec extends AnyFlatSpec with should.Matchers {
 
@@ -58,13 +59,25 @@ class TypescriptSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "serialize" should "properly generate a Typescript interface" in {
+    val scalaClass = """
+    case class MyDataClass(id: Option[UUID], numList: Seq[Int])
+    """.parse[Stat].get
+
+    val parsedFields = scalaClass match {
+      case someClass: Defn.Class =>
+        someClass.ctor.children
+          .collect { case tree: Tree =>
+            DMT.extractFieldsFromClass(tree)
+          }
+          .flatten
+          .map(DMT.classFieldToModelField)
+      case _                     => Seq.empty
+    }
+
     val sut = Typescript
       .Interface(
         name = "MyInterface",
-        fields = Seq(
-          ModelField(name = "id", typ = "Option[UUID]"),
-          ModelField(name = "numList", typ = "Seq[Int]")
-        )
+        fields = parsedFields
       )
       .toString
 

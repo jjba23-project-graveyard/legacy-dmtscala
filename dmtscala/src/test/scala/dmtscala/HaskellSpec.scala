@@ -18,7 +18,10 @@
 import org.scalatest._
 import flatspec._
 import matchers._
+import io.github.jjba23.dmtscala.Haskell
 import io.github.jjba23.dmtscala.Haskell._
+import io.github.jjba23.dmtscala.DMT
+import scala.meta._
 
 class HaskellSpec extends AnyFlatSpec with should.Matchers {
 
@@ -53,5 +56,33 @@ class HaskellSpec extends AnyFlatSpec with should.Matchers {
       "`someField`" -> "someField"
     )
     xs.foreach { case (k, v) => toHaskellName(k) should be(v) }
+  }
+
+  "serialize" should "properly generate a Haskell record" in {
+    val scalaClass = """
+    case class MyDataClass(id: Option[UUID], numList: Seq[Int])
+    """.parse[Stat].get
+
+    val parsedFields = scalaClass match {
+      case someClass: Defn.Class =>
+        someClass.ctor.children
+          .collect { case tree: Tree =>
+            DMT.extractFieldsFromClass(tree)
+          }
+          .flatten
+          .map(DMT.classFieldToModelField)
+      case _                     => Seq.empty
+    }
+
+    val sut = Haskell
+      .Record(
+        name = "MyDataClass",
+        fields = parsedFields
+      )
+      .toString
+
+    sut should be(
+      "data MyDataClass = MyDataClass{\n\tid :: Maybe UUID,\n\tnumList :: [Int],\n} deriving (Eq, Show, Generic, FromJSON, ToJSON)\n\nmakeFieldLabelsNoPrefix ''MyDataClass\n"
+    )
   }
 }
