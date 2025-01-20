@@ -34,12 +34,13 @@ object Haskell {
 
   private val typMap: Map[String, String] = Map.from(
     Seq(
-      "String"  -> "String",
-      "Instant" -> "ZonedTime",
-      "Int"     -> "Int",
-      "Long"    -> "Int",
-      "Double"  -> "Double",
-      "Boolean" -> "Bool"
+      "String"        -> "String",
+      "Instant"       -> "ZonedTime",
+      "ZonedDateTime" -> "ZonedTime",
+      "Int"           -> "Int",
+      "Long"          -> "Int",
+      "Double"        -> "Double",
+      "Boolean"       -> "Bool"
     )
   )
 
@@ -81,7 +82,7 @@ object Haskell {
       val withLensS    = if (withLens) { s"\nmakeFieldLabelsNoPrefix ''$name\n" }
       else { "" }
       val mappedFields = fields
-        .map(x => s"\t${toHaskellName(x.name)} :: ${toHaskellType(x.typ)},")
+        .map(x => s"    ${toHaskellName(x.name)} :: ${toHaskellType(x.typ)},")
         .mkString("\n")
       s"""|data $name = $name{
     |$mappedFields

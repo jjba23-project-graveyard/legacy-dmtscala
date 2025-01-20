@@ -7,31 +7,31 @@ from typing import List, Optional
 
 @dataclass
 class MonitoringSiteRegistrationDetails:
-	monitoringSiteId:int
-	solarEdgeSiteId:str
+    monitoringSiteId: int
+    solarEdgeSiteId: str
 
 @dataclass
 class DerDetailsDto:
-	id:str
-	type:str
-	serial:str
-	vendor:str
-	derControllerId:str
+    id: str
+    type: str
+    serial: str
+    vendor: str
+    derControllerId: str
 
 @dataclass
 class DerDetailsResponseDto:
-	ders:List[DerDetailsDto]
+    ders: List[DerDetailsDto]
 
 @dataclass
 class SolarEdgeOnboardingFailureDto:
-	id:str
-	monitoringSiteId:str
-	monitoringSiteName:str
-	derSerial:str
-	creationTime:str
-	commentsCount:int
-	createdBy:str
-	taskStatus:str
-	errorDescription:str
-	lastFailureStageMessage:Optional[str]
-	lastFailureStageDate:Optional[str]
+    id: str
+    monitoringSiteId: str
+    monitoringSiteName: str
+    derSerial: str
+    creationTime: str
+    commentsCount: int
+    createdBy: str
+    taskStatus: str
+    errorDescription: str
+    lastFailureStageMessage: Optional[str]
+    lastFailureStageDate: Optional[str]

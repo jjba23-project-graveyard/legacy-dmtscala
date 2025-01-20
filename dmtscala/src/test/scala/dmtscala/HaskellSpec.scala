@@ -87,7 +87,7 @@ object HaskellSpec extends ZIOSpecDefault {
         .toString
 
       assertTrue(
-        sut == "data MyDataClass = MyDataClass{\n\tid :: Maybe UUID,\n\tnumList :: [Int],\n} deriving (Eq, Show, Generic, FromJSON, ToJSON)\n\nmakeFieldLabelsNoPrefix ''MyDataClass\n"
+        sut == "data MyDataClass = MyDataClass{\n    id :: Maybe UUID,\n    numList :: [Int],\n} deriving (Eq, Show, Generic, FromJSON, ToJSON)\n\nmakeFieldLabelsNoPrefix ''MyDataClass\n"
       )
     }
   )

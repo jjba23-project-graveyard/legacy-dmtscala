@@ -30,13 +30,14 @@ object Typescript {
 
   private val typMap: Map[String, String] = Map.from(
     Seq(
-      "String"  -> "string",
-      "UUID"    -> "string",
-      "Instant" -> "string",
-      "Int"     -> "number",
-      "Long"    -> "number",
-      "Double"  -> "number",
-      "Boolean" -> "boolean"
+      "String"        -> "string",
+      "UUID"          -> "string",
+      "Instant"       -> "string",
+      "ZonedDateTime" -> "string",
+      "Int"           -> "number",
+      "Long"          -> "number",
+      "Double"        -> "number",
+      "Boolean"       -> "boolean"
     )
   )
 
@@ -74,7 +75,7 @@ object Typescript {
     override def toString: String = {
       val mappedFields = fields
         .map(x =>
-          s"\t${toTypescriptName((x.name, x.typ))}: ${toTypescriptType(x.typ)};"
+          s"    ${toTypescriptName((x.name, x.typ))}: ${toTypescriptType(x.typ)};"
         )
         .mkString("\n")
       s"""|export interface $name {
@@ -82,5 +83,4 @@ object Typescript {
     |}""".stripMargin
     }
   }
-
 }

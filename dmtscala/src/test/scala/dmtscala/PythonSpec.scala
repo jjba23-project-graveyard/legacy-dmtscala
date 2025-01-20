@@ -87,7 +87,7 @@ object PythonSpec extends ZIOSpecDefault {
         .toString
 
       assertTrue(
-        sut == "@dataclass\nclass MyDataClass:\n\tid:Optional[str]\n\tnumList:List[int]"
+        sut == "@dataclass\nclass MyDataClass:\n    id: Optional[str]\n    numList: List[int]"
       )
     }
   )

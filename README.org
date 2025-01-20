@@ -20,6 +20,19 @@ DMT can be highly beneficial for a company, saving money, time and preventing er
 
 [[file:resources/img/dall-e-1-thumb.png]]  
 
+** Why not OpenAPI / Protobuf, etc?
+
+It is a good question whether to use those intermediate data formats, but they are lossy in translation. A Scala Meta tree is lossless and as such it will allow for very interesting things, also as cross-references and more.
+
+Some of the following ideas are feasible using dmtscala's approach in the future:
+- it's fun to work with abstract syntax trees and build up different data types from them
+- translate imports of commonly used packages (java.util.UUID -> Data.UUID)
+- do interesting cross-referencing via packages, imports and more
+- translate inline comments and documentation from language to language
+- translate simple class methods and functions from language to language (think validations, or fullName = firstName + lastName)
+
+** More advantages
+
 Here's some more details about why this tool can be helpful:
 
 *Unified Data Models*: DMT ensures that the same data structures are used across programs. This minimizes discrepancies between how data is represented and validated in both systems.
@@ -29,8 +42,6 @@ Here's some more details about why this tool can be helpful:
 *Automation Saves Time*: Manually translating models is time-consuming and prone to human error. Automating this process accelerates development and allows developers to focus on more critical tasks.
 
 *Prevents Runtime Errors*: Ensuring type alignment between programs reduces bugs that arise due to type mismatches or unexpected data formats.
-
-*Easier Debugging*: With consistent models, debugging issues related to data transformation or API consumption becomes more straightforward.
 
 *Clear Data Contracts*: A standardized approach to model translation makes it easier for developers (especially new team members) to understand and work with the data structures used across the stack.
 
@@ -79,42 +90,7 @@ If you pass e.g. ~./resources/scala-files/Basic.scala~ then files like ~./resour
 
 Here is how an example run looks like:
 
-#+begin_example
->>= [info] - 1737119612 - parsing syntax tree for ./resources/scala-files/Basic.scala
->>= [info] - 1737119613 - detected class of name: MonitoringSiteRegistrationDetails
->>= [info] - 1737119613 - Scala model:
-
-case class MonitoringSiteRegistrationDetails(
-  monitoringSiteId: Int,
-  solarEdgeSiteId: UUID
-)
-
->>= [info] - 1737119613 - Typescript interface:
-
-interface MonitoringSiteRegistrationDetails {
-	monitoringSiteId: number;
-	solarEdgeSiteId: string;
-}
-    
-
->>= [info] - 1737119613 - Haskell record:
-
-data MonitoringSiteRegistrationDetails = MonitoringSiteRegistrationDetails{
-	monitoringSiteId :: Int,
-	solarEdgeSiteId :: UUID,
-} deriving (Eq, Show, Generic, FromJSON, ToJSON)
-
-makeFieldLabelsNoPrefix ''MonitoringSiteRegistrationDetails
-
-    
-
->>= [info] - 1737119613 - Python dataclass:
-
-@dataclass
-class MonitoringSiteRegistrationDetails:
-	monitoringSiteId:int
-	solarEdgeSiteId:str
-#+end_example
+[[file:resources/img/screen-thumb.png]]
 
 ** Scala versions supported
 

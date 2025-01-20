@@ -21,8 +21,23 @@ import DMT._
 import scopt.OParser
 import CLIConfig._
 import zio._
+import zio.logging._
+import zio.logging.LogFormat._
 
 object Main extends ZIOAppDefault {
+
+  override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
+    Runtime.removeDefaultLoggers >>> consoleLogger(
+      ConsoleLoggerConfig(
+        text("[") |-| level.color(LogColor.MAGENTA) |-| text("] ") |-|
+          text("dmtscala - ") |-|
+          timestamp.fixed(32).color(LogColor.MAGENTA) |-| text(" - ") |-|
+          line.color(LogColor.WHITE).highlight +
+          (space + label("cause", cause).highlight)
+            .filter(LogFilter.causeNonEmpty),
+        LogFilter.LogLevelByNameConfig.default
+      )
+    )
 
   override def run: ZIO[Environment with ZIOAppArgs with Scope, Any, Any] = {
     (for {

@@ -71,7 +71,7 @@ object DMT {
                          }.flatten
 
     _ <- ZIO.logInfo("Scala model:").unless(config.silent)
-    _ <- ZIO.logInfo(someClass.toString).unless(config.silent)
+    _ <- ZIO.logInfo("\n\n" + someClass.toString + "\n").unless(config.silent)
 
     typescriptInterface <-
       if (config.toTypescript) {
@@ -81,7 +81,7 @@ object DMT {
         )
         for {
           _ <- ZIO.logInfo("Typescript interface:").unless(config.silent)
-          _ <- ZIO.logInfo(ts.toString).unless(config.silent)
+          _ <- ZIO.logInfo("\n\n" + ts.toString + "\n").unless(config.silent)
         } yield (Some(ts))
       } else { ZIO.none }
 
@@ -93,7 +93,7 @@ object DMT {
         )
         for {
           _ <- ZIO.logInfo("Haskell record:").unless(config.silent)
-          _ <- ZIO.logInfo(hs.toString).unless(config.silent)
+          _ <- ZIO.logInfo("\n\n" + hs.toString + "\n").unless(config.silent)
         } yield (Some(hs))
       } else { ZIO.none }
 
@@ -105,7 +105,7 @@ object DMT {
         )
         for {
           _ <- ZIO.logInfo("Python dataclass:").unless(config.silent)
-          _ <- ZIO.logInfo(py.toString).unless(config.silent)
+          _ <- ZIO.logInfo("\n\n" + py.toString + "\n").unless(config.silent)
         } yield (Some(py))
       } else { ZIO.none }
 

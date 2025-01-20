@@ -8,43 +8,43 @@
 import Optics
 
 data MonitoringSiteRegistrationDetails = MonitoringSiteRegistrationDetails{
-	monitoringSiteId :: Int,
-	solarEdgeSiteId :: UUID,
+    monitoringSiteId :: Int,
+    solarEdgeSiteId :: UUID,
 } deriving (Eq, Show, Generic, FromJSON, ToJSON)
 
 makeFieldLabelsNoPrefix ''MonitoringSiteRegistrationDetails
 
 
 data DerDetailsDto = DerDetailsDto{
-	id :: UUID,
-	type :: String,
-	serial :: String,
-	vendor :: String,
-	derControllerId :: UUID,
+    id :: UUID,
+    type :: String,
+    serial :: String,
+    vendor :: String,
+    derControllerId :: UUID,
 } deriving (Eq, Show, Generic, FromJSON, ToJSON)
 
 makeFieldLabelsNoPrefix ''DerDetailsDto
 
 
 data DerDetailsResponseDto = DerDetailsResponseDto{
-	ders :: [DerDetailsDto],
+    ders :: [DerDetailsDto],
 } deriving (Eq, Show, Generic, FromJSON, ToJSON)
 
 makeFieldLabelsNoPrefix ''DerDetailsResponseDto
 
 
 data SolarEdgeOnboardingFailureDto = SolarEdgeOnboardingFailureDto{
-	id :: UUID,
-	monitoringSiteId :: String,
-	monitoringSiteName :: String,
-	derSerial :: String,
-	creationTime :: ZonedTime,
-	commentsCount :: Int,
-	createdBy :: String,
-	taskStatus :: String,
-	errorDescription :: String,
-	lastFailureStageMessage :: Maybe String,
-	lastFailureStageDate :: Maybe ZonedTime,
+    id :: UUID,
+    monitoringSiteId :: String,
+    monitoringSiteName :: String,
+    derSerial :: String,
+    creationTime :: ZonedTime,
+    commentsCount :: Int,
+    createdBy :: String,
+    taskStatus :: String,
+    errorDescription :: String,
+    lastFailureStageMessage :: Maybe String,
+    lastFailureStageDate :: Maybe ZonedTime,
 } deriving (Eq, Show, Generic, FromJSON, ToJSON)
 
 makeFieldLabelsNoPrefix ''SolarEdgeOnboardingFailureDto

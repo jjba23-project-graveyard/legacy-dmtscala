@@ -32,13 +32,14 @@ object Python {
 
   private val typMap: Map[String, String] = Map.from(
     Seq(
-      "String"  -> "str",
-      "UUID"    -> "str",
-      "Instant" -> "str",
-      "Int"     -> "int",
-      "Long"    -> "long",
-      "Double"  -> "double",
-      "Boolean" -> "bool"
+      "String"        -> "str",
+      "UUID"          -> "str",
+      "Instant"       -> "str",
+      "ZonedDateTime" -> "str",
+      "Int"           -> "int",
+      "Long"          -> "long",
+      "Double"        -> "double",
+      "Boolean"       -> "bool"
     )
   )
 
@@ -72,7 +73,7 @@ object Python {
 
     override def toString: String = {
       val mappedFields = fields
-        .map(x => s"\t${toPythonName(x.name)}:${toPythonType(x.typ)}")
+        .map(x => s"    ${toPythonName(x.name)}: ${toPythonType(x.typ)}")
         .mkString("\n")
       s"""|@dataclass
     |class $name:

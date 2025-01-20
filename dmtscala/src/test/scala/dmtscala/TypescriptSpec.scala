@@ -88,7 +88,7 @@ object TypescriptSpec extends ZIOSpecDefault {
         .toString
 
       assertTrue(
-        sut == "export interface MyInterface {\n\tid?: string;\n\tnumList: number[];\n}"
+        sut == "export interface MyInterface {\n    id?: string;\n    numList: number[];\n}"
       )
     }
   )

@@ -29,3 +29,12 @@ run-basic-scala:
 	sbt "dmtscala/run --to-typescript=true \
 		--to-python=true --to-haskell=true \
 		--with-inputs=./resources/scala-files/Basic.scala"
+
+run-basic-scala-silent-ts:
+	sbt "dmtscala/run --to-typescript=true --silent=true\
+		--with-inputs=./resources/scala-files/Basic.scala"
+
+run-advanced-scala:
+	sbt "dmtscala/run --to-typescript=true \
+		--to-python=true --to-haskell=true \
+		--with-inputs=./resources/scala-files/Advanced.scala"

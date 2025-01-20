@@ -4,32 +4,32 @@
 //
 
 export interface MonitoringSiteRegistrationDetails {
-	monitoringSiteId: number;
-	solarEdgeSiteId: string;
+    monitoringSiteId: number;
+    solarEdgeSiteId: string;
 }
 
 export interface DerDetailsDto {
-	id: string;
-	type: string;
-	serial: string;
-	vendor: string;
-	derControllerId: string;
+    id: string;
+    type: string;
+    serial: string;
+    vendor: string;
+    derControllerId: string;
 }
 
 export interface DerDetailsResponseDto {
-	ders: DerDetailsDto[];
+    ders: DerDetailsDto[];
 }
 
 export interface SolarEdgeOnboardingFailureDto {
-	id: string;
-	monitoringSiteId: string;
-	monitoringSiteName: string;
-	derSerial: string;
-	creationTime: string;
-	commentsCount: number;
-	createdBy: string;
-	taskStatus: string;
-	errorDescription: string;
-	lastFailureStageMessage?: string;
-	lastFailureStageDate?: string;
+    id: string;
+    monitoringSiteId: string;
+    monitoringSiteName: string;
+    derSerial: string;
+    creationTime: string;
+    commentsCount: number;
+    createdBy: string;
+    taskStatus: string;
+    errorDescription: string;
+    lastFailureStageMessage?: string;
+    lastFailureStageDate?: string;
 }
