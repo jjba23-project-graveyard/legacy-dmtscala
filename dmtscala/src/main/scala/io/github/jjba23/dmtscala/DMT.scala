@@ -20,7 +20,6 @@ package io.github.jjba23.dmtscala
 import zio._
 import scala.meta._
 import scala.io.{Source => FileSource}
-import Logger._
 import java.io.File
 import java.io.PrintWriter
 import Haskell.{serialize => serializeHaskell}
@@ -52,69 +51,71 @@ object DMT {
       typ = x.decltpe.map(_.toString).getOrElse("")
     )
 
+  def extractClass(tree: Tree): Option[Defn.Class] = tree match {
+    case someClass: Defn.Class => {
+      Some(someClass)
+    }
+    case _                     => None
+  }
+
   def extractDataModelFromTree(
     config: DMTConfig,
-    tree: Tree
-  ): Option[DMTModel] = {
-    tree match {
-      case someClass: Defn.Class => {
-        if (!config.silent)
-          logInfo(s"detected class of name: ${someClass.name}")
+    someClass: Defn.Class
+  ): Task[DMTModel] = for {
+    _                 <- ZIO
+                           .logInfo(s"detected class of name: ${someClass.name}")
+                           .unless(config.silent)
 
-        val m: Seq[Term.Param] = someClass.ctor.children.collect {
-          case tree: Tree =>
-            extractFieldsFromClass(tree)
-        }.flatten
+    m: Seq[Term.Param] = someClass.ctor.children.collect { case tree: Tree =>
+                           extractFieldsFromClass(tree)
+                         }.flatten
 
-        if (!config.silent) logInfo("Scala model:")
-        if (!config.silent) logRaw(someClass.toString)
+    _ <- ZIO.logInfo("Scala model:").unless(config.silent)
+    _ <- ZIO.logInfo(someClass.toString).unless(config.silent)
 
-        val typescriptInterface: Option[Typescript.Interface] =
-          if (config.toTypescript) {
-            val ts = Typescript.Interface(
-              name = someClass.name.toString,
-              fields = m.map(classFieldToModelField)
-            )
-            if (!config.silent) logInfo("Typescript interface:")
-            if (!config.silent) logRaw(ts.toString)
-            Some(ts)
-          } else { None }
-
-        val haskellRecord: Option[Haskell.Record] =
-          if (config.toHaskell) {
-            val hs = Haskell.Record(
-              name = someClass.name.toString,
-              fields = m.map(classFieldToModelField)
-            )
-            if (!config.silent) logInfo("Haskell record:")
-            if (!config.silent) logRaw(hs.toString)
-            Some(hs)
-          } else { None }
-
-        val pythonDataClass: Option[Python.DataClass] =
-          if (config.toPython) {
-            val py = Python.DataClass(
-              name = someClass.name.toString,
-              fields = m.map(classFieldToModelField)
-            )
-            if (!config.silent) logInfo("Python dataclass:")
-            if (!config.silent) logRaw(py.toString)
-            Some(py)
-          } else { None }
-
-        Some(
-          DMTModel(
-            name = someClass.name.toString,
-            scala = someClass,
-            typescriptInterface = typescriptInterface,
-            haskellRecord = haskellRecord,
-            pythonDataClass = pythonDataClass
-          )
+    typescriptInterface <-
+      if (config.toTypescript) {
+        val ts = Typescript.Interface(
+          name = someClass.name.toString,
+          fields = m.map(classFieldToModelField)
         )
-      }
-      case _                     => None
-    }
-  }
+        for {
+          _ <- ZIO.logInfo("Typescript interface:").unless(config.silent)
+          _ <- ZIO.logInfo(ts.toString).unless(config.silent)
+        } yield (Some(ts))
+      } else { ZIO.none }
+
+    haskellRecord <-
+      if (config.toHaskell) {
+        val hs = Haskell.Record(
+          name = someClass.name.toString,
+          fields = m.map(classFieldToModelField)
+        )
+        for {
+          _ <- ZIO.logInfo("Haskell record:").unless(config.silent)
+          _ <- ZIO.logInfo(hs.toString).unless(config.silent)
+        } yield (Some(hs))
+      } else { ZIO.none }
+
+    pythonDataClass <-
+      if (config.toPython) {
+        val py = Python.DataClass(
+          name = someClass.name.toString,
+          fields = m.map(classFieldToModelField)
+        )
+        for {
+          _ <- ZIO.logInfo("Python dataclass:").unless(config.silent)
+          _ <- ZIO.logInfo(py.toString).unless(config.silent)
+        } yield (Some(py))
+      } else { ZIO.none }
+
+  } yield (DMTModel(
+    name = someClass.name.toString,
+    scala = someClass,
+    typescriptInterface = typescriptInterface,
+    haskellRecord = haskellRecord,
+    pythonDataClass = pythonDataClass
+  ))
 
   def readTreeFromFile(filePath: String): Task[Source] =
     ZIO.attempt(FileSource.fromFile(filePath).mkString.parse[Source].get)
@@ -131,11 +132,19 @@ object DMT {
            .unless(config.silent)
 
     treeData <- readTreeFromFile(file.getAbsolutePath())
-    models    = treeData
-                  .collect { case tree =>
-                    extractDataModelFromTree(config = config, tree = tree)
+    classes   = treeData
+                  .collect { case tree => extractClass(tree) }
+                  .collect { case Some(v) =>
+                    v
                   }
-                  .collect { case Some(v) => v }
+                  .toSeq
+
+    models <- ZIO.collectAll(classes.map { someClass =>
+                extractDataModelFromTree(
+                  config = config,
+                  someClass = someClass
+                )
+              })
 
     _ <- ZIO
            .logInfo("saving translations to files")
