@@ -15,74 +15,80 @@
 // You should have received a copy of the Lesser GNU General Public License
 // along with dmtscala.  If not, see <https://www.gnu.org/licenses/>.
 
-import org.scalatest._
-import flatspec._
-import matchers._
 import io.github.jjba23.dmtscala.Python._
 import io.github.jjba23.dmtscala.Python
 import io.github.jjba23.dmtscala.DMT
 import scala.meta._
+import zio.test._
 
-class PythonSpec extends AnyFlatSpec with should.Matchers {
+object PythonSpec extends ZIOSpecDefault {
 
-  "toPythonType" should "translate types properly" in {
+  val typeExpectations: Seq[(String, String)] = Seq(
+    "String"                 -> "str",
+    "Option[String]"         -> "Optional[str]",
+    "Seq[String]"            -> "List[str]",
+    "Option[Seq[String]]"    -> "Optional[List[str]]",
+    "List[String]"           -> "List[str]",
+    "Option[List[String]]"   -> "Optional[List[str]]",
+    "Boolean"                -> "bool",
+    "Option[Boolean]"        -> "Optional[bool]",
+    "Int"                    -> "int",
+    "Option[Int]"            -> "Optional[int]",
+    "Seq[Int]"               -> "List[int]",
+    "Option[Seq[Int]]"       -> "Optional[List[int]]",
+    "List[Int]"              -> "List[int]",
+    "Option[List[Int]]"      -> "Optional[List[int]]",
+    "Seq[SomeClass]"         -> "List[SomeClass]",
+    "List[SomeClass]"        -> "List[SomeClass]",
+    "Option[Seq[SomeClass]]" -> "Optional[List[SomeClass]]"
+  )
+  val nameExpectations: Seq[(String, String)] = Seq(
+    "someField"   -> "someField",
+    "`type`"      -> "type",
+    "`someField`" -> "someField"
+  )
 
-    val xs: Seq[(String, String)] = Seq(
-      "String"                 -> "str",
-      "Option[String]"         -> "Optional[str]",
-      "Seq[String]"            -> "List[str]",
-      "Option[Seq[String]]"    -> "Optional[List[str]]",
-      "List[String]"           -> "List[str]",
-      "Option[List[String]]"   -> "Optional[List[str]]",
-      "Boolean"                -> "bool",
-      "Option[Boolean]"        -> "Optional[bool]",
-      "Int"                    -> "int",
-      "Option[Int]"            -> "Optional[int]",
-      "Seq[Int]"               -> "List[int]",
-      "Option[Seq[Int]]"       -> "Optional[List[int]]",
-      "List[Int]"              -> "List[int]",
-      "Option[List[Int]]"      -> "Optional[List[int]]",
-      "Seq[SomeClass]"         -> "List[SomeClass]",
-      "List[SomeClass]"        -> "List[SomeClass]",
-      "Option[Seq[SomeClass]]" -> "Optional[List[SomeClass]]"
-    )
-    xs.foreach { case (k, v) => toPythonType(k) should be(v) }
-  }
-
-  "toPythonName" should "translate names properly" in {
-    val xs: Seq[(String, String)] = Seq(
-      "someField"   -> "someField",
-      "`type`"      -> "type",
-      "`someField`" -> "someField"
-    )
-    xs.foreach { case (k, v) => toPythonName(k) should be(v) }
-  }
-
-  "serialize" should "properly generate a Python interface" in {
-    val scalaClass = """
-    case class MyDataClass(id: Option[UUID], numList: Seq[Int])
-    """.parse[Stat].get
-
-    val parsedFields = scalaClass match {
-      case someClass: Defn.Class =>
-        someClass.ctor.children
-          .collect { case tree: Tree =>
-            DMT.extractFieldsFromClass(tree)
-          }
-          .flatten
-          .map(DMT.classFieldToModelField)
-      case _                     => Seq.empty
-    }
-
-    val sut = Python
-      .DataClass(
-        name = "MyDataClass",
-        fields = parsedFields
+  def spec = suite("Python")(
+    test("toPythonType should perform translation properly") {
+      assertTrue(
+        typeExpectations
+          .map(p => toPythonType(p._1) == p._2)
+          .forall(_ == true)
       )
-      .toString
+    },
+    test("toPythonName should perform translation properly") {
+      assertTrue(
+        nameExpectations
+          .map(p => toPythonName(p._1) == p._2)
+          .forall(_ == true)
+      )
+    },
+    test("serialize should properly generate a Typescript interface") {
+      val scalaClass = """
+  case class MyDataClass(id: Option[UUID], numList: Seq[Int])
+  """.parse[Stat].get
 
-    sut should be(
-      "@dataclass\nclass MyDataClass:\n\tid:Optional[str]\n\tnumList:List[int]"
-    )
-  }
+      val parsedFields = scalaClass match {
+        case someClass: Defn.Class =>
+          someClass.ctor.children
+            .collect { case tree: Tree =>
+              DMT.extractFieldsFromClass(tree)
+            }
+            .flatten
+            .map(DMT.classFieldToModelField)
+        case _                     => Seq.empty
+      }
+
+      val sut = Python
+        .DataClass(
+          name = "MyDataClass",
+          fields = parsedFields
+        )
+        .toString
+
+      assertTrue(
+        sut == "@dataclass\nclass MyDataClass:\n\tid:Optional[str]\n\tnumList:List[int]"
+      )
+    }
+  )
 }
