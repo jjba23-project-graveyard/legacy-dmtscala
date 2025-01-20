@@ -14,7 +14,6 @@ data MonitoringSiteRegistrationDetails = MonitoringSiteRegistrationDetails{
 
 makeFieldLabelsNoPrefix ''MonitoringSiteRegistrationDetails
 
-    
 
 data DerDetailsDto = DerDetailsDto{
 	id :: UUID,
@@ -26,7 +25,6 @@ data DerDetailsDto = DerDetailsDto{
 
 makeFieldLabelsNoPrefix ''DerDetailsDto
 
-    
 
 data DerDetailsResponseDto = DerDetailsResponseDto{
 	ders :: [DerDetailsDto],
@@ -34,7 +32,6 @@ data DerDetailsResponseDto = DerDetailsResponseDto{
 
 makeFieldLabelsNoPrefix ''DerDetailsResponseDto
 
-    
 
 data SolarEdgeOnboardingFailureDto = SolarEdgeOnboardingFailureDto{
 	id :: UUID,
@@ -51,5 +48,3 @@ data SolarEdgeOnboardingFailureDto = SolarEdgeOnboardingFailureDto{
 } deriving (Eq, Show, Generic, FromJSON, ToJSON)
 
 makeFieldLabelsNoPrefix ''SolarEdgeOnboardingFailureDto
-
-    

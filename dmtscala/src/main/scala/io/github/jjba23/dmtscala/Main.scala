@@ -20,16 +20,20 @@ package io.github.jjba23.dmtscala
 import DMT._
 import scopt.OParser
 import CLIConfig._
+import zio._
 
-object Main {
+object Main extends ZIOAppDefault {
 
-  def main(args: Array[String]) = {
-
-    OParser.parse(dmtConfigParser, args, DMTConfig()) match {
-      case Some(config) => runDMT(config)
-      case _            =>
-      // arguments are bad, error message will have been displayed
-    }
+  override def run: ZIO[Environment with ZIOAppArgs with Scope, Any, Any] = {
+    (for {
+      args <- ZIO.service[ZIOAppArgs]
+      _    <-
+        OParser
+          .parse(dmtConfigParser, args.getArgs, DMTConfig()) match {
+          case Some(config) => (runDMT(config)).exitCode
+          case _            => ZIO.unit
+        }
+      _    <- ZIO.logInfo("")
+    } yield ()).exitCode
   }
-
 }

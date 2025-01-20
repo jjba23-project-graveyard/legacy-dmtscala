@@ -3,27 +3,24 @@
 // output of dmtscala:
 //
 
-interface MonitoringSiteRegistrationDetails {
+export interface MonitoringSiteRegistrationDetails {
 	monitoringSiteId: number;
 	solarEdgeSiteId: string;
 }
-    
 
-interface DerDetailsDto {
+export interface DerDetailsDto {
 	id: string;
 	type: string;
 	serial: string;
 	vendor: string;
 	derControllerId: string;
 }
-    
 
-interface DerDetailsResponseDto {
+export interface DerDetailsResponseDto {
 	ders: DerDetailsDto[];
 }
-    
 
-interface SolarEdgeOnboardingFailureDto {
+export interface SolarEdgeOnboardingFailureDto {
 	id: string;
 	monitoringSiteId: string;
 	monitoringSiteName: string;
@@ -36,4 +33,3 @@ interface SolarEdgeOnboardingFailureDto {
 	lastFailureStageMessage?: string;
 	lastFailureStageDate?: string;
 }
-    

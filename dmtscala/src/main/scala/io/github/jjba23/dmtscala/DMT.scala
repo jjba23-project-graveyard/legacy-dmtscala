@@ -17,6 +17,7 @@
 
 package io.github.jjba23.dmtscala
 
+import zio._
 import scala.meta._
 import scala.io.{Source => FileSource}
 import Logger._
@@ -115,57 +116,64 @@ object DMT {
     }
   }
 
-  val readTreeFromFile: String => Source = (filePath: String) => {
-    val basicFile: String     = FileSource.fromFile(filePath).mkString
-    val basicFileTree: Source = basicFile.parse[Source].get
-    basicFileTree
+  def readTreeFromFile(filePath: String): Task[Source] =
+    ZIO.attempt(FileSource.fromFile(filePath).mkString.parse[Source].get)
+
+  def writeToFile(path: String)(data: String): Task[Unit] = ZIO.attempt {
+    val pw = new PrintWriter(new File(path))
+    try pw.write(data)
+    finally pw.close()
   }
 
-  val writeToFile: String => String => Unit = path =>
-    data => {
-      val pw = new PrintWriter(new File(path))
-      try pw.write(data)
-      finally pw.close()
-    }
+  def runDMTOnFile(config: DMTConfig)(file: File): Task[Unit] = for {
+    _ <- ZIO
+           .logInfo(s"parsing syntax tree for ${file.getAbsolutePath()}")
+           .unless(config.silent)
 
-  def runDMT(config: DMTConfig): Unit = config.withInputs
-    .foreach(file => {
-      if (!config.silent)
-        logInfo(s"parsing syntax tree for ${file.getAbsolutePath()}")
+    treeData <- readTreeFromFile(file.getAbsolutePath())
+    models    = treeData
+                  .collect { case tree =>
+                    extractDataModelFromTree(config = config, tree = tree)
+                  }
+                  .collect { case Some(v) => v }
 
-      val models: Seq[DMTModel] = readTreeFromFile(file.getAbsolutePath())
-        .collect { case tree =>
-          extractDataModelFromTree(config = config, tree = tree)
-        }
-        .collect { case Some(v) => v }
+    _ <- ZIO
+           .logInfo("saving translations to files")
+           .unless(config.silent)
 
-      if (!config.silent) logInfo("saving translations to files")
+    _ <- ZIO.when(config.toTypescript) {
+           val typescriptFile =
+             file.getAbsolutePath().replaceAll("\\.scala", ".ts")
+           val tsModels       = models
+             .map(dmtModel => dmtModel.typescriptInterface)
+             .collect { case Some(v) => v }
+           writeToFile(typescriptFile)(serializeTypescript(tsModels))
+         }
 
-      if (config.toTypescript) {
-        val typescriptFile =
-          file.getAbsolutePath().replaceAll("\\.scala", ".ts")
-        val tsModels       = models
-          .map(dmtModel => dmtModel.typescriptInterface)
-          .collect { case Some(v) => v }
-        writeToFile(typescriptFile)(serializeTypescript(tsModels))
-      }
+    _ <- ZIO.when(config.toHaskell) {
+           val haskellFile =
+             file.getAbsolutePath().replaceAll("\\.scala", ".hs")
+           val hsModels    = models
+             .map(dmtModel => dmtModel.haskellRecord)
+             .collect { case Some(v) => v }
+           writeToFile(haskellFile)(serializeHaskell(hsModels))
+         }
 
-      if (config.toHaskell) {
-        val haskellFile = file.getAbsolutePath().replaceAll("\\.scala", ".hs")
-        val hsModels    = models
-          .map(dmtModel => dmtModel.haskellRecord)
-          .collect { case Some(v) => v }
-        writeToFile(haskellFile)(serializeHaskell(hsModels))
-      }
+    _ <- ZIO.when(config.toPython) {
+           val pythonFile = file.getAbsolutePath().replaceAll("\\.scala", ".py")
+           val pyModels   = models
+             .map(dmtModel => dmtModel.pythonDataClass)
+             .collect { case Some(v) => v }
+           writeToFile(pythonFile)(serializePython(pyModels))
+         }
 
-      if (config.toPython) {
-        val pythonFile = file.getAbsolutePath().replaceAll("\\.scala", ".py")
-        val pyModels   = models
-          .map(dmtModel => dmtModel.pythonDataClass)
-          .collect { case Some(v) => v }
-        writeToFile(pythonFile)(serializePython(pyModels))
-      }
+    _ <- ZIO
+           .logInfo("finalized saving translations to files")
+           .unless(config.silent)
 
-      if (!config.silent) logInfo("finalized saving translations to files")
-    })
+  } yield ()
+
+  def runDMT(config: DMTConfig): Task[Unit] =
+    ZIO.foreachDiscard(config.withInputs)(runDMTOnFile(config))
+
 }

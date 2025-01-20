@@ -34,11 +34,17 @@ object Dependencies extends AutoPlugin {
 
   object autoImport {
 
-    val ScalaMeta: ModuleID = "org.scalameta"    %% "scalameta" % "4.12.5"
-    val Scalactic: ModuleID = "org.scalactic"    %% "scalactic" % "3.2.19"
-    val Scalatest: ModuleID = "org.scalatest"    %% "scalatest" % "3.2.19"
-    val Scopt: ModuleID     = "com.github.scopt" %% "scopt"     % "4.1.0"
+    val ScalaMeta  = "org.scalameta"    %% "scalameta"   % "4.12.5"
+    val Scalactic  = "org.scalactic"    %% "scalactic"   % "3.2.19"
+    val Scalatest  = "org.scalatest"    %% "scalatest"   % "3.2.19"
+    val Scopt      = "com.github.scopt" %% "scopt"       % "4.1.0"
+    val Zio        = "dev.zio"          %% "zio"         % "2.1.14"
+    val ZioLogging = "dev.zio"          %% "zio-logging" % "2.4.0"
 
-    val dmtscalaDependencies: Seq[ModuleID] = Seq(ScalaMeta, Scalactic, Scalatest, Scopt)
+    val ZioTest         = "dev.zio" %% "zio-test"          % "2.1.14"
+    val ZioTestSbt      = "dev.zio" %% "zio-test-sbt"      % "2.1.14"
+    val ZioTestMagnolia = "dev.zio" %% "zio-test-magnolia" % "2.1.14"
+
+    val dmtscalaDependencies: Seq[ModuleID] = Seq(ScalaMeta, Scalactic, Scalatest, Scopt, Zio, ZioLogging, ZioTest, ZioTestSbt, ZioTestMagnolia)
   }
 }

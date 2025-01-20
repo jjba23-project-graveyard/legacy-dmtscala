@@ -9,7 +9,6 @@ from typing import List, Optional
 class MonitoringSiteRegistrationDetails:
 	monitoringSiteId:int
 	solarEdgeSiteId:str
-    
 
 @dataclass
 class DerDetailsDto:
@@ -18,12 +17,10 @@ class DerDetailsDto:
 	serial:str
 	vendor:str
 	derControllerId:str
-    
 
 @dataclass
 class DerDetailsResponseDto:
 	ders:List[DerDetailsDto]
-    
 
 @dataclass
 class SolarEdgeOnboardingFailureDto:
@@ -38,4 +35,3 @@ class SolarEdgeOnboardingFailureDto:
 	errorDescription:str
 	lastFailureStageMessage:Optional[str]
 	lastFailureStageDate:Optional[str]
-    
