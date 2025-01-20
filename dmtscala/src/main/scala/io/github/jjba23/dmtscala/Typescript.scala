@@ -28,7 +28,7 @@ object Typescript {
     ).mkString("\n") + "\n\n" +
       xs.map(_.toString).mkString("\n\n")
 
-  val typMap: Map[String, String] = Map.from(
+  private val typMap: Map[String, String] = Map.from(
     Seq(
       "String"  -> "string",
       "UUID"    -> "string",
@@ -41,9 +41,8 @@ object Typescript {
   )
 
   val toTypescriptType: String => String = x => {
-    val isOptional: Boolean    = x.startsWith("Option[")
-    val optionalSuffix: String = if (isOptional) "?" else ""
-    val fromOption: String     =
+    val isOptional: Boolean = x.startsWith("Option[")
+    val fromOption: String  =
       if (isOptional) x.drop(7).dropRight(1) else x
 
     val isSeq: Boolean  = fromOption.startsWith("Seq[")
@@ -56,24 +55,31 @@ object Typescript {
     val listSuffix = if (isSeq || isList) "[]" else ""
 
     val typ = typMap.get(fromList).getOrElse(fromList)
-    s"$typ$listSuffix$optionalSuffix"
+    Seq(typ, listSuffix).mkString
   }
 
-  val toTypescriptName: String => String = x => {
-    if (x.startsWith("`") && x.endsWith("`")) { x.drop(1).dropRight(1) }
-    else x
+  def toTypescriptName(nameTypeTuple: (String, String)): String = {
+    val isOptional: Boolean    = nameTypeTuple._2.startsWith("Option[")
+    val optionalSuffix: String = if (isOptional) "?" else ""
+
+    val nam =
+      if (nameTypeTuple._1.startsWith("`") && nameTypeTuple._1.endsWith("`")) {
+        nameTypeTuple._1.drop(1).dropRight(1)
+      } else nameTypeTuple._1
+    Seq(nam, optionalSuffix).mkString
   }
 
   case class Interface(name: String, fields: Seq[ModelField]) {
 
     override def toString: String = {
       val mappedFields = fields
-        .map(x => s"\t${toTypescriptName(x.name)}: ${toTypescriptType(x.typ)};")
+        .map(x =>
+          s"\t${toTypescriptName((x.name, x.typ))}: ${toTypescriptType(x.typ)};"
+        )
         .mkString("\n")
-      s"""|interface $name {
+      s"""|export interface $name {
     |$mappedFields
-    |}
-    """.stripMargin
+    |}""".stripMargin
     }
   }
 

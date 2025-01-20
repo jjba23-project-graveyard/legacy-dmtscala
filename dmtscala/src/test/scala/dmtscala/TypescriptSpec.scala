@@ -19,6 +19,8 @@ import org.scalatest._
 import flatspec._
 import matchers._
 import io.github.jjba23.dmtscala.Typescript._
+import io.github.jjba23.dmtscala.Typescript
+import io.github.jjba23.dmtscala.ModelField
 
 class TypescriptSpec extends AnyFlatSpec with should.Matchers {
 
@@ -26,24 +28,24 @@ class TypescriptSpec extends AnyFlatSpec with should.Matchers {
 
     val xs: Seq[(String, String)] = Seq(
       "String"                 -> "string",
-      "Option[String]"         -> "string?",
+      "Option[String]"         -> "string",
       "Seq[String]"            -> "string[]",
-      "Option[Seq[String]]"    -> "string[]?",
+      "Option[Seq[String]]"    -> "string[]",
       "List[String]"           -> "string[]",
-      "Option[List[String]]"   -> "string[]?",
+      "Option[List[String]]"   -> "string[]",
       "Boolean"                -> "boolean",
-      "Option[Boolean]"        -> "boolean?",
+      "Option[Boolean]"        -> "boolean",
       "Int"                    -> "number",
-      "Option[Int]"            -> "number?",
+      "Option[Int]"            -> "number",
       "Seq[Int]"               -> "number[]",
-      "Option[Seq[Int]]"       -> "number[]?",
+      "Option[Seq[Int]]"       -> "number[]",
       "List[Int]"              -> "number[]",
-      "Option[List[Int]]"      -> "number[]?",
+      "Option[List[Int]]"      -> "number[]",
       "Seq[SomeClass]"         -> "SomeClass[]",
       "List[SomeClass]"        -> "SomeClass[]",
-      "Option[Seq[SomeClass]]" -> "SomeClass[]?"
+      "Option[Seq[SomeClass]]" -> "SomeClass[]"
     )
-    xs.foreach { case (k, v) => toTypescriptType(k) should be(v) }
+    xs.foreach { case (_, v) => toTypescriptType(v) should be(v) }
   }
 
   "toTypescriptName" should "translate names properly" in {
@@ -52,6 +54,17 @@ class TypescriptSpec extends AnyFlatSpec with should.Matchers {
       "`type`"      -> "type",
       "`someField`" -> "someField"
     )
-    xs.foreach { case (k, v) => toTypescriptName(k) should be(v) }
+    xs.foreach { case (k, v) => toTypescriptName((k, v)) should be(v) }
+  }
+
+  "serialize" should "properly generate a Typescript interface" in {
+    val sut = Typescript
+      .Interface(
+        name = "MyInterface",
+        fields = Seq(ModelField(name = "id", typ = "Option[UUID]"))
+      )
+      .toString
+
+    sut should be("export interface MyInterface {\n\tid?: string;\n}")
   }
 }

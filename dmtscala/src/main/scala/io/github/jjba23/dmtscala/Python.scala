@@ -30,7 +30,7 @@ object Python {
     ).mkString("\n") + "\n\n" +
       xs.map(_.toString).mkString("\n\n")
 
-  val typMap: Map[String, String] = Map.from(
+  private val typMap: Map[String, String] = Map.from(
     Seq(
       "String"  -> "str",
       "UUID"    -> "str",
@@ -60,7 +60,7 @@ object Python {
     val listPrefix = if (isSeq || isList) "List[" else ""
 
     val typ = typMap.get(fromList).getOrElse(fromList)
-    s"$optionalPrefix$listPrefix$typ$listSuffix$optionalSuffix"
+    Seq(optionalPrefix, listPrefix, typ, listSuffix, optionalSuffix).mkString
   }
 
   val toPythonName: String => String = x => {
@@ -76,8 +76,7 @@ object Python {
         .mkString("\n")
       s"""|@dataclass
     |class $name:
-    |$mappedFields
-    """.stripMargin
+    |$mappedFields""".stripMargin
     }
   }
 

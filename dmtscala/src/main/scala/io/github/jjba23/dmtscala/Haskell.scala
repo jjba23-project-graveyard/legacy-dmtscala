@@ -32,7 +32,7 @@ object Haskell {
     ).mkString("\n") + "\n\n" +
       xs.map(_.toString).mkString("\n\n")
 
-  val typMap: Map[String, String] = Map.from(
+  private val typMap: Map[String, String] = Map.from(
     Seq(
       "String"  -> "String",
       "Instant" -> "ZonedTime",
@@ -60,7 +60,7 @@ object Haskell {
     val listPrefix = if (isSeq || isList) "[" else ""
 
     val typ = typMap.get(fromList).getOrElse(fromList)
-    s"$optionalPrefix$listPrefix$typ$listSuffix"
+    Seq(optionalPrefix, listPrefix, typ, listSuffix).mkString
   }
 
   val toHaskellName: String => String = x => {
@@ -86,8 +86,7 @@ object Haskell {
       s"""|data $name = $name{
     |$mappedFields
     |}${withDeriving.getOrElse("")}
-    |${withLensS}
-    """.stripMargin
+    |${withLensS}""".stripMargin
     }
   }
 }

@@ -33,7 +33,7 @@ interface SolarEdgeOnboardingFailureDto {
 	createdBy: string;
 	taskStatus: string;
 	errorDescription: string;
-	lastFailureStageMessage: string?;
-	lastFailureStageDate: string?;
+	lastFailureStageMessage?: string;
+	lastFailureStageDate?: string;
 }
     
