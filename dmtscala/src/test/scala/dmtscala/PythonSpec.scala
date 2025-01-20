@@ -19,6 +19,8 @@ import org.scalatest._
 import flatspec._
 import matchers._
 import io.github.jjba23.dmtscala.Python._
+import io.github.jjba23.dmtscala.Python
+import io.github.jjba23.dmtscala.ModelField
 
 class PythonSpec extends AnyFlatSpec with should.Matchers {
 
@@ -53,5 +55,21 @@ class PythonSpec extends AnyFlatSpec with should.Matchers {
       "`someField`" -> "someField"
     )
     xs.foreach { case (k, v) => toPythonName(k) should be(v) }
+  }
+
+  "serialize" should "properly generate a Python interface" in {
+    val sut = Python
+      .DataClass(
+        name = "MyInterface",
+        fields = Seq(
+          ModelField(name = "id", typ = "Option[UUID]"),
+          ModelField(name = "numList", typ = "Seq[Int]")
+        )
+      )
+      .toString
+
+    sut should be(
+      "@dataclass\nclass MyInterface:\n\tid:Optional[str]\n\tnumList:List[int]"
+    )
   }
 }

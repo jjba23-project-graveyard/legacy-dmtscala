@@ -61,10 +61,15 @@ class TypescriptSpec extends AnyFlatSpec with should.Matchers {
     val sut = Typescript
       .Interface(
         name = "MyInterface",
-        fields = Seq(ModelField(name = "id", typ = "Option[UUID]"))
+        fields = Seq(
+          ModelField(name = "id", typ = "Option[UUID]"),
+          ModelField(name = "numList", typ = "Seq[Int]")
+        )
       )
       .toString
 
-    sut should be("export interface MyInterface {\n\tid?: string;\n}")
+    sut should be(
+      "export interface MyInterface {\n\tid?: string;\n\tnumList: number[];\n}"
+    )
   }
 }
